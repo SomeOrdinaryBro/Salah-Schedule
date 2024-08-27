@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const apiUrl = 'http://api.aladhan.com/v1/calendarByCity/2024/08?city=Colombo&country=Sri Lanka&method=3';
+    const apiUrl = 'https://api.aladhan.com/v1/calendarByCity/2024/08?city=Colombo&country=Sri%20Lanka&method=3';
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -20,12 +20,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const now = new Date();
             const times = [cleanTime(timings.Fajr), cleanTime(timings.Dhuhr), cleanTime(timings.Asr), cleanTime(timings.Maghrib), cleanTime(timings.Isha)];
             const nextPrayer = times.find(time => new Date(`${new Date().toDateString()} ${time}`).getTime() > now.getTime());
-            const nextPrayerTime = new Date(`${new Date().toDateString()} ${nextPrayer}`);
-            const diff = nextPrayerTime - now;
+            
+            if (nextPrayer) {
+                const nextPrayerTime = new Date(`${new Date().toDateString()} ${nextPrayer}`);
+                const diff = nextPrayerTime - now;
 
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            document.getElementById('countdown').textContent = `${hours} hours and ${minutes} minutes`;
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById('countdown').textContent = `${hours} hours and ${minutes} minutes`;
+            } else {
+                document.getElementById('countdown').textContent = 'No upcoming prayers today';
+            }
         })
-        .catch(error => console.error('Error fetching prayer times:', error));
+        .catch(error => {
+            console.error('Error fetching prayer times:', error);
+            document.querySelector('.prayer-time-container').textContent = 'Error fetching prayer times.';
+        });
 });
